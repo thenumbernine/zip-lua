@@ -2,6 +2,8 @@
 
 Bindings are found in my luajit-ffi-bindings project.
 
+This is pretty incomplete at the moment.  I'm just using it for reading zip archives.
+
 Example:
 
 ``` Lua
