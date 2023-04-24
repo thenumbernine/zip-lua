@@ -13,10 +13,22 @@ local ffi = require 'ffi'
 local class = require 'ext.class'
 local zip = require 'ffi.zip'
 local ZipPath = require 'zip.path'
+local GCWrapper = require 'ffi.gcwrapper.gcwrapper'
 
-local ZipArchive = class()
+
+local ZipArchive = class(GCWrapper{
+	gctype = 'autorelease_zip_t',
+	ctype = 'zip_t*',
+	release = function(ptr)
+		if ptr[0] ~= nil then
+			zip.zip_close(ptr[0])
+			ptr[0] = nil
+		end
+	end,
+})
 
 function ZipArchive:init(fn)
+	ZipArchive.super.init(self)
 	-- TODO what about creating zips?
 	assert(fn, "expected filename")
 	self.filename = fn
@@ -24,6 +36,7 @@ function ZipArchive:init(fn)
 	-- TODO common behavior as other apis like cl and gl and posix ... consolidate?
 	local err = ffi.new('int[1]', 0)
 	self.handle = zip.zip_open(fn, 0, err)
+	self.gc.ptr[0] = self.handle
 	if err[0] ~= 0 then
 		-- TODO can I convert this to zip_error_t , and then to zip_error_strerror?
 		-- ... is it already a zip_error_t?
@@ -31,13 +44,15 @@ function ZipArchive:init(fn)
 	end
 end
 
+--[[ not getting called ... so I'll use my ffi.gcwrapper.gcwrapper
 function ZipArchive:__gc()
+print('function ZipArchive:__gc()')
 	if self.handle then
--- TODO ... is this working?
-print('freeing zip '..self.filename)
+print('freeing zip',self.filename)
 		zip.zip_close(self.handle)
 	end
 end
+--]]
 
 function ZipArchive:numFiles(flags)
 	return zip.zip_get_num_entries(self.handle, flags or 0)
@@ -50,7 +65,7 @@ end
 function ZipArchive:dir()
 	return coroutine.wrap(function()
 		for i=0,#self-1 do
-			return ZipPath(self, i)
+			coroutine.yield(ZipPath(self, i))
 		end
 	end)
 end
