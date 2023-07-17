@@ -7,7 +7,7 @@ local ZipPath = class()
 function ZipPath:init(archive, index)
 	self.zip = assert(archive)
 	self.index = index	-- index, or nil for dead references
-	-- for ext.file compat, allow bad refs to init, but don't let them do anything
+	-- for ext.path compat, allow bad refs to init, but don't let them do anything
 	--assert(self.index or self.filename)
 end
 
@@ -71,7 +71,7 @@ function ZipPath:attr(flags)
 end
 
 -- TODO ZipPath:open() that returns a ZipFile for :read and :write and close operations ...
--- then this could double as file:read / os.readfile
+-- then this could double as path:read / os.readfile
 function ZipPath:readbuf(flags)
 	if not self.index then error("ZipPath:attr() failed: invalid zipfile") end
 	flags = flags or 0
@@ -100,13 +100,13 @@ function ZipPath:readbuf(flags)
 		-- so it doesn't use the ol' zip_error_t method?
 		error("zip_fclose() failed")
 	end
-	-- now in the name of ext.file compat I could return a string, but meh
-	-- file is for vanilla lua anyways, this is only for luajit
+	-- now in the name of ext.path compat I could return a string, but meh
+	-- path is for vanilla lua anyways, this is only for luajit
 	-- but what's a buffer without its size? so ...
 	return buffer, attr
 end
 
--- returns a string, just like ext.file:read()
+-- returns a string, just like ext.path:read()
 function ZipPath:read(flags)
 	local buf, attr = self:readbuf(flags)
 	return ffi.string(buf, attr.size), attr
