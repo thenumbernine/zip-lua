@@ -11,7 +11,7 @@ zip:read(fn) = read
 --]]
 local ffi = require 'ffi'
 local class = require 'ext.class'
-local zip = require 'ffi.zip'
+local zip = require 'ffi.req' '.zip'
 local ZipPath = require 'zip.path'
 local GCWrapper = require 'ffi.gcwrapper.gcwrapper'
 
