@@ -3,21 +3,16 @@ I could make a separate 'tar' project
 but it's probably a better idea to just put this all in an 'archive' project
 and abstract the interface for various formats
 --]]
+require 'ext.gc'	-- __gc for luajit
 local ffi = require 'ffi'
 local class = require 'ext.class'
-local GCWrapper = require 'ffi.gcwrapper.gcwrapper'
 local archive = require 'ffi.req' 'archive'
 
-local TarArchive = class(GCWrapper{
-	gctype = 'autorelease_tar_t',
-	ctype = 'struct archive*',
-	release = function(ptr)
-		if ptr[0] ~= nil then
-			archive.archive_read_free(ptr[0])
-			ptr[0] = nil
-		end
-	end,
-})
+local TarArchive = class()
+
+function TarArchive:free()
+	archive.archive_read_free(self.handle)
+end
 
 local function archiveAssert(fname, handle, ...)
 	local ret = archive[fname](handle, ...)
@@ -35,10 +30,8 @@ local function archiveAssert(fname, handle, ...)
 end
 
 function TarArchive:init(fn)
-	TarArchive.super.init(self)
 	self.archive = archive.archive_read_new()
 	if self.archive == nil then error'archive_read_new failed' end
-	self.gc.ptr[0] = self.handle
 
 	archiveAssert('archive_read_support_format_all', self.handle)
 	archiveAssert('archive_read_open_filename', self.handle, filename, 10240)

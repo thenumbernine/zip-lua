@@ -9,26 +9,15 @@ zip(path) = zipped-file reference
 
 zip:read(fn) = read
 --]]
+require 'ext.gc'	-- add __gc to luajit
 local ffi = require 'ffi'
 local class = require 'ext.class'
 local zip = require 'ffi.req' 'zip'
 local ZipPath = require 'zip.path'
-local GCWrapper = require 'ffi.gcwrapper.gcwrapper'
 
-
-local ZipArchive = class(GCWrapper{
-	gctype = 'autorelease_zip_t',
-	ctype = 'zip_t*',
-	release = function(ptr)
-		if ptr[0] ~= nil then
-			zip.zip_close(ptr[0])
-			ptr[0] = nil
-		end
-	end,
-})
+local ZipArchive = class()
 
 function ZipArchive:init(fn)
-	ZipArchive.super.init(self)
 	-- TODO what about creating zips?
 	assert(fn, "expected filename")
 	self.filename = fn
@@ -36,13 +25,20 @@ function ZipArchive:init(fn)
 	-- TODO common behavior as other apis like cl and gl and posix ... consolidate?
 	local err = ffi.new('int[1]', 0)
 	self.handle = zip.zip_open(fn, 0, err)
-	self.gc.ptr[0] = self.handle
 	if err[0] ~= 0 then
 		-- TODO can I convert this to zip_error_t , and then to zip_error_strerror?
 		-- ... is it already a zip_error_t?
 		error("zip_open("..tostring(fn)..") failed with error "..tostring(err[0]))
 	end
 end
+
+function ZipArchive:close()
+	if self.handle == nil then return end
+	zip.zip_close(self.handle)
+	self.handle = nil
+end
+
+ZipArchive.__gc = ZipArchive.close
 
 --[[ not getting called ... so I'll use my ffi.gcwrapper.gcwrapper
 function ZipArchive:__gc()
