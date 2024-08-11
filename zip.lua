@@ -40,7 +40,7 @@ end
 
 ZipArchive.__gc = ZipArchive.close
 
---[[ not getting called ... so I'll use my ffi.gcwrapper.gcwrapper
+--[[ not getting called ... so I'll use __gc
 function ZipArchive:__gc()
 print('function ZipArchive:__gc()')
 	if self.handle then
