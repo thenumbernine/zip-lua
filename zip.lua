@@ -15,6 +15,8 @@ local class = require 'ext.class'
 local zip = require 'ffi.req' 'zip'
 local ZipPath = require 'zip.path'
 
+local int_1 = ffi.typeof'int[1]'
+
 local ZipArchive = class()
 
 function ZipArchive:init(fn)
@@ -23,7 +25,7 @@ function ZipArchive:init(fn)
 	self.filename = fn
 
 	-- TODO common behavior as other apis like cl and gl and posix ... consolidate?
-	local err = ffi.new('int[1]', 0)
+	local err = int_1(0)
 	self.handle = zip.zip_open(fn, 0, err)
 	if err[0] ~= 0 then
 		-- TODO can I convert this to zip_error_t , and then to zip_error_strerror?

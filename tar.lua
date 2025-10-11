@@ -8,6 +8,10 @@ local ffi = require 'ffi'
 local class = require 'ext.class'
 local archive = require 'ffi.req' 'archive'
 
+
+local archive_entry_1 = ffi.typeof'struct archive_entry[1]'
+
+
 local TarArchive = class()
 
 function TarArchive:free()
@@ -38,7 +42,7 @@ function TarArchive:init(fn)
 end
 
 function TarArchive:dir()
-	local entry = ffi.new'struct archive_entry[1]'
+	local entry = archive_entry_1()
 	while true do
 		local ret = archive.archive_read_next_header(self.handle, entry)
 		if ret == archive.ARCHIVE_EOF then 

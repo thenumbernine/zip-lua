@@ -2,6 +2,11 @@ local ffi = require 'ffi'
 local class = require 'ext.class'
 local zip = require 'ffi.req' 'zip'
 
+
+local uint8_t_arr = ffi.typeof'uint8_t[?]'
+local zip_stat_t_1 = ffi.typeof'zip_stat_t[1]'
+
+
 local ZipPath = class()
 
 function ZipPath:init(archive, index)
@@ -47,7 +52,7 @@ ZipPath.attrKeyMap = {
 function ZipPath:attr(flags)
 	if not self.index then error("ZipPath:attr() failed: invalid zipfile") end
 	flags = flags or 0
-	local st = ffi.new'zip_stat_t[1]'
+	local st = zip_stat_t_1()
 	zip.zip_stat_init(st)
 	if self.index then
 		if zip.zip_stat_index(self.zip.handle, self.index, flags, st) == -1 then
@@ -77,7 +82,7 @@ function ZipPath:readbuf(flags)
 	flags = flags or 0
 	local attr = self:attr()
 	local size = attr.size
-	local buffer = ffi.new('uint8_t[?]', size)
+	local buffer = uint8_t_arr(size)
 	-- TODO ZipFile class with :read(), :write(), :close()
 	local f
 	if self.index then
