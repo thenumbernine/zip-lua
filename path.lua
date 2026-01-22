@@ -1,6 +1,6 @@
 local ffi = require 'ffi'
 local class = require 'ext.class'
-local zip = require 'ffi.req' 'zip'
+local zip = require 'zip.ffi.zip'
 
 
 local uint8_t_arr = ffi.typeof'uint8_t[?]'

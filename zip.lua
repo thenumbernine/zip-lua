@@ -12,7 +12,7 @@ zip:read(fn) = read
 require 'ext.gc'	-- add __gc to luajit
 local ffi = require 'ffi'
 local class = require 'ext.class'
-local zip = require 'ffi.req' 'zip'
+local zip = require 'zip.ffi.zip'
 local ZipPath = require 'zip.path'
 
 local int_1 = ffi.typeof'int[1]'
