@@ -16,7 +16,7 @@ deps = {
 	"ext",
 	"ffi",
 }
-generateBindings = {
+generateBindings = function()return{
 	-- libzip-dev
 	-- TODO #define ZIP_OPSYS_* is hex values, should be enums, but they are being commented out ...
 	-- because they have 'u' suffixes
@@ -50,4 +50,4 @@ wrapper.ZIP_UINT64_MAX = ]]..preproc.macros.ZIP_UINT64_MAX..'\n'..[[
 			}
 		end,
 	},
-}
+}end
