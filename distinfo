@@ -4,13 +4,14 @@
 
 name = "zip"
 files = {
-	["README.md"] = "zip/README.md",
-	["ffi/zip.lua"] = "zip/ffi/zip.lua",
-	["path.lua"] = "zip/path.lua",
-	["tar.lua"] = "zip/tar.lua",
-	["test.lua"] = "zip/test.lua",
-	["test.zip"] = "zip/test.zip",
-	["zip.lua"] = "zip/zip.lua",
+	"README.md",
+	"distinfo",
+	"ffi/zip.lua",
+	"path.lua",
+	"tar.lua",
+	"test.lua",
+	"test.zip",
+	"zip.lua",
 }
 deps = {
 	"ext",
