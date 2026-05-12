@@ -3,6 +3,8 @@
 --------------------------------------------
 
 name = "zip"
+git = "https://github.com/thenumbernine/zip-lua"
+
 files = {
 	"README.md",
 	"distinfo",
